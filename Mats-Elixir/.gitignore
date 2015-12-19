@@ -1,0 +1,41 @@
+# App artifacts
+/_build
+/db
+/deps
+/*.ez
+
+# Generate on crash by the VM
+erl_crash.dump
+
+# Static artifacts
+/node_modules
+
+# Since we are building assets from web/static,
+# we ignore priv/static. You may want to comment
+# this depending on your deployment strategy.
+# But webpack doesn't handle this autocopying that brunch does, so we need to put assets directly into priv
+# so we don't want to ignore the assets, only the other stuff
+/priv/static/js
+/priv/static/css
+
+# The config/prod.secret.exs file by default contains sensitive
+# data and you should not commit it into version control.
+#
+# Alternatively, you may comment the line below and commit the
+# secrets file as long as you replace its contents by environment
+# variables.
+/config/prod.secret.exs
+
+# idea stuff
+.idea
+*.iml
+
+# emacs stuff
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
