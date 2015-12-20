@@ -1,11 +1,15 @@
-use std::env;
+use std::io::{self, Read};
 
 pub fn day1() {
-    if let Some(instructions) = env::args().nth(2) {
-        println!("Floor: {}", find_floor(instructions.as_ref()));
-        println!("Basement: {}", find_basement(instructions.as_ref()));
-    } else {
-        println!("Usage:\n    aoc2015 1 <input>.");
+    let mut buffer = String::new();
+    match io::stdin().read_to_string(&mut buffer) {
+        Ok(_) => {
+            println!("Floor: {}", find_floor(buffer.as_ref()));
+            println!("Basement: {}", find_basement(buffer.as_ref()));
+        },
+        Err(error) => {
+            println!("Error reading stdin {}", error)
+        }
     }
 }
 
