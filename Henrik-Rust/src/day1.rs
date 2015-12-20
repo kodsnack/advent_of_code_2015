@@ -1,16 +1,7 @@
-use std::io::{self, Read};
 
-pub fn day1() {
-    let mut buffer = String::new();
-    match io::stdin().read_to_string(&mut buffer) {
-        Ok(_) => {
-            println!("Floor: {}", find_floor(buffer.as_ref()));
-            println!("Basement: {}", find_basement(buffer.as_ref()));
-        },
-        Err(error) => {
-            println!("Error reading stdin {}", error)
-        }
-    }
+pub fn day1(input: String) {
+    println!("Floor: {}", find_floor(input.as_ref()));
+    println!("Basement: {}", find_basement(input.as_ref()));
 }
 
 fn find_floor(inst: &str) -> isize {
@@ -28,7 +19,8 @@ fn find_basement(inst: &str) -> usize {
     let mut acc: isize = 0;
 
     for (i, c) in inst.chars().enumerate() {
-        acc = acc + match c {
+        acc = acc +
+              match c {
             '(' => 1,
             ')' => -1,
             _ => 0,
