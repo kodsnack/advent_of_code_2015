@@ -95,3 +95,62 @@ var aOC2015d4 = function (key) {
 };
 
 aOC2015d4("");
+
+var aOC2015d5 = function (input) {
+    'use strict';
+    var vowels = 'aeiou';
+    var hasAtLeastThreeVowels = function (string) {
+        var numVowels = 0;
+        var i;
+        var numChars = string.length;
+        for (i = 0; i < numChars; i += 1) {
+            if (vowels.indexOf(string[i]) !== -1) {
+                numVowels += 1;
+            }
+        }
+        return numVowels >= 3;
+    };
+    var containsDoubleLetter = function (string) {
+        var lastChar, currentChar, i;
+        var numChars = string.length;
+        var containsDouble = false;
+        for (i = 0; i < numChars; i++) {
+            currentChar = string[i];
+            if (currentChar === lastChar) {
+                containsDouble = true;
+                break;
+            }
+            lastChar = currentChar;
+        }
+        return containsDouble;
+    };
+    var containsDisallowedStrings = function (string) {
+        return string.indexOf('ab') !== -1
+            || string.indexOf('cd') !== -1
+            || string.indexOf('pq') !== -1
+            || string.indexOf('xy') !== -1
+    };
+    var isNice = function (string) {
+        if (containsDisallowedStrings(string)) {
+            return false;
+        }
+        if (!containsDoubleLetter(string)) {
+            return false;
+        }
+        if (!hasAtLeastThreeVowels(string)) {
+            return false;
+        }
+        return true;
+    }
+    var niceStrings = 0;
+    var numInputs = input.length;
+    var j;
+    for (j = 0; j < numInputs; j += 1) {
+        if (isNice(input[j])) {
+            niceStrings += 1;
+        }
+    }
+    console.log(niceStrings);
+};
+
+aOC2015d5([]);
