@@ -19,6 +19,6 @@ library
   -- exposed-modules:     
   -- other-modules:       
   -- other-extensions:    
-  build-depends:       base >=4.8 && <4.9
+  build-depends:       base >=4.8 && <4.9, pureMD5 >= 2.1.2.1
   hs-source-dirs:      src
   default-language:    Haskell2010
