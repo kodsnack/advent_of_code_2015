@@ -1,7 +1,11 @@
+#![feature(iter_arith)]
+
 use std::env;
 use std::io::{self, Read};
 
 mod day1;
+mod day2;
+mod day3;
 
 fn main() {
     println!("Welcome to Advent of Rust 2015!");
@@ -19,6 +23,8 @@ fn main() {
 
     match day.as_ref() {
         "1" => day1::day1(input),
+        "2" => day2::day2(input),
+        "3" => day3::day3(input),
         _ => println!("{} not implemented", day),
     }
 }
