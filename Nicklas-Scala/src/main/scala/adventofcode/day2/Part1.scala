@@ -3,7 +3,7 @@ package adventofcode.day2
 object Part1 {
 
   def run(input: String): Unit = {
-    val dims = input.split("\n")
+    val dims = parseInput(input)
 
     val required = dims.foldLeft(0) { (acc, size) =>
       size match {
@@ -22,8 +22,6 @@ object Part1 {
       }
     }
 
-    println("Required: " + required)
+    println(s"Required: $required")
   }
-
-  private val pattern = """(\d+)x(\d+)x(\d+)""".r
 }
