@@ -4,11 +4,11 @@ use std::cmp;
 pub fn day2(input: String) {
 
     let area: usize = input.lines()
-                          .map(|dimensions| Gift::new(dimensions).total_area())
-                          .sum();
+                           .map(|dimensions| Gift::new(dimensions).total_area())
+                           .sum();
     let length: usize = input.lines()
-                          .map(|dimensions| Gift::new(dimensions).ribon_length())
-                          .sum();
+                             .map(|dimensions| Gift::new(dimensions).ribon_length())
+                             .sum();
     println!("square feet of wrapping paper: {}", area);
     println!("feet of ribbon: {}", length);
 }
