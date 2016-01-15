@@ -26,9 +26,20 @@ module Stream = struct
 
   let map f stream =
     let rec next i =
-      try Some (f (Stream.next stream))
-      with Stream.Failure -> None in
+      try Some (f @@ Stream.next stream)
+      with Stream.Failure -> None
+    in
     Stream.from next
+  ;;
+
+  let find f stream =
+    let rec search v =
+      if f v then v
+      else search @@ Stream.next stream
+    in
+    try
+      search @@ Stream.next stream
+    with Stream.Failure -> raise Not_found
   ;;
 
   let fold f init stream =
@@ -42,7 +53,8 @@ module Stream = struct
       try
         let value = Stream.next stream in
         if p value then Some value else next i
-      with Stream.Failure -> None in
+      with Stream.Failure -> None
+    in
     Stream.from next
   ;;
 
@@ -56,7 +68,7 @@ module List = struct
       match items with
       | [] -> failwith "min requires a non-empty list"
       | [x] -> x
-      | x :: tail -> min x (search tail)
+      | x :: tail -> min x @@ search tail
     in
     search items
   ;;
@@ -66,7 +78,7 @@ module List = struct
       match items with
       | [] -> failwith "max requires a non-empty list"
       | [x] -> x
-      | x :: tail -> max x (search tail)
+      | x :: tail -> max x @@ search tail
     in
     search items
   ;;
@@ -86,5 +98,5 @@ module Option = struct
     | None -> false
   ;;
 
-  let is_none o = not (is_some o);;
+  let is_none o = not @@ is_some o;;
 end
