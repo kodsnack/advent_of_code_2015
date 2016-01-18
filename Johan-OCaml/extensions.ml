@@ -73,7 +73,14 @@ module Stream = struct
     Stream.from next
   ;;
 
+  let to_list stream =
+    let list = ref [] in
+    Stream.iter (fun v -> list := !list @ [v]) stream;
+    !list
+  ;;
+
 end
+
 
 module List = struct
   include List
