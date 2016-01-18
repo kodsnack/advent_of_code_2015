@@ -12,10 +12,25 @@ module File = struct
 
 end
 
+module String = struct
+  include String
+
+  let to_list s =
+    let rec build n l =
+      if n = 0 then l
+      else build (n - 1) (s.[n - 1] :: l)
+    in
+    build (String.length s) []
+  ;;
+
+end
+
+
 module Stream = struct
   include Stream
 
   let of_chars = Stream.of_channel
+  ;;
 
   let of_lines ch =
     Stream.from (fun _ ->
@@ -58,10 +73,20 @@ module Stream = struct
     Stream.from next
   ;;
 
+  let to_list stream =
+    let list = ref [] in
+    Stream.iter (fun v -> list := !list @ [v]) stream;
+    !list
+  ;;
+
 end
+
 
 module List = struct
   include List
+
+  let keep = List.filter
+  ;;
 
   let min items =
     let rec search items =
@@ -83,6 +108,8 @@ module List = struct
     search items
   ;;
 
+  let of_string = String.to_list
+  ;;
 end
 
 module Option = struct
@@ -98,5 +125,6 @@ module Option = struct
     | None -> false
   ;;
 
-  let is_none o = not @@ is_some o;;
+  let is_none o = not @@ is_some o
+  ;;
 end

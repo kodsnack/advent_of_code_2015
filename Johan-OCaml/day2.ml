@@ -24,20 +24,25 @@ let ribbon_length_for b =
   in
   smallest_perimeter + for_bow
 
-let () =
-  (* part 1 *)
+
+let part1 =
   File.open_in "day2.input" (fun ch ->
     Stream.of_lines ch
     |> Stream.map parse_box
     |> Stream.map area_of
     |> Stream.fold ( + ) 0
     |> Printf.printf "part 1: %d sq feet of paper needed\n"
-  );
-  (* part 2 *)
+  )
+
+let part2 =
   File.open_in "day2.input" (fun ch ->
     Stream.of_lines ch
     |> Stream.map parse_box
     |> Stream.map ribbon_length_for
     |> Stream.fold ( + ) 0
     |> Printf.printf "part 2: %d feet of ribbon needed\n"
-  );
+  )
+
+let () =
+  part1;
+  part2;

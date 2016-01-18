@@ -33,18 +33,23 @@ let deliver2 instructions =
   in
   follow instructions (0,0) (0,0) (Houses.(empty |> add ((0,0) |> to_string) true))
 
-let () =
-  (* part 1 *)
+
+let part1 =
   File.open_in "day3.input" (fun ch ->
     Stream.of_chars ch
     |> deliver
     |> Houses.cardinal
     |> Printf.printf "part 1: %d house(s) visited\n"
-  );
-  (* part 2 *)
+  )
+
+let part2 =
   File.open_in "day3.input" (fun ch ->
     Stream.of_chars ch
     |> deliver2
     |> Houses.cardinal
     |> Printf.printf "part 2: %d house(s) visited\n"
   )
+
+let () =
+  part1;
+  part2;
