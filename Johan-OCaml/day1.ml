@@ -5,18 +5,18 @@ let up_or_down ch =
   | '(' -> 1
   | ')' -> -1
   | _ -> 0 (* ignore bad instructions *)
+;;
 
-
-let part1 =
+let part1 () =
   File.open_in "day1.input" (fun ch ->
     Stream.of_chars ch
     |> Stream.map up_or_down
     |> Stream.fold ( + ) 0
     |> Printf.printf "part 1: ended up on floor %d\n";
   )
+;;
 
-
-let part2 =
+let part2 () =
   File.open_in "day1.input" (fun ch ->
     let rec walk_to_basement floor steps stream =
       if floor = -1 then
@@ -26,7 +26,7 @@ let part2 =
     in
     Stream.of_chars ch |> walk_to_basement 0 0
   )
+;;
 
-let () =
-  part1;
-  part2;
+part1 ();;
+part2 ();;
