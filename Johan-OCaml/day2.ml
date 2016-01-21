@@ -1,12 +1,13 @@
 #use "./extensions.ml";;
 
-type box = { l: int; w: int; h: int }
+type box = { l: int; w: int; h: int };;
 let parse_box line =
   Scanf.sscanf line "%dx%dx%d" (fun l w h ->
     { l=l; w=w; h=h }
   )
+;;
 
-let double = ( * ) 2
+let double = ( * ) 2;;
 
 let area_of b =
   let sides = [b.l * b.w; b.w * b.h; b.h * b.l] in
@@ -14,6 +15,7 @@ let area_of b =
   sides
   |> List.map double
   |> List.fold_left ( + ) smallest
+;;
 
 let ribbon_length_for b =
   let for_bow = b.l * b.w * b.h
@@ -23,9 +25,9 @@ let ribbon_length_for b =
     |> List.min
   in
   smallest_perimeter + for_bow
+;;
 
-
-let part1 =
+let part1 () =
   File.open_in "day2.input" (fun ch ->
     Stream.of_lines ch
     |> Stream.map parse_box
@@ -33,8 +35,9 @@ let part1 =
     |> Stream.fold ( + ) 0
     |> Printf.printf "part 1: %d sq feet of paper needed\n"
   )
+;;
 
-let part2 =
+let part2 () =
   File.open_in "day2.input" (fun ch ->
     Stream.of_lines ch
     |> Stream.map parse_box
@@ -42,7 +45,7 @@ let part2 =
     |> Stream.fold ( + ) 0
     |> Printf.printf "part 2: %d feet of ribbon needed\n"
   )
+;;
 
-let () =
-  part1;
-  part2;
+part1 ();;
+part2 ();;

@@ -3,6 +3,7 @@
 let has_vowels n s =
   let vowels = String.contains "aeiou" in
   List.of_string s |> List.keep vowels |> List.length >= n
+;;
 
 let has_doubled s =
   let rec scan = function
@@ -12,6 +13,7 @@ let has_doubled s =
       else scan t
   in
   scan @@ List.of_string s
+;;
 
 let has_forbidden s =
   let rec scan = function
@@ -22,6 +24,7 @@ let has_forbidden s =
       | _ -> scan t
   in
   scan @@ List.of_string s
+;;
 
 let has_repeated s =
   let rec scan = function
@@ -31,6 +34,7 @@ let has_repeated s =
       else scan t
   in
   scan @@ List.of_string s
+;;
 
 let has_pair_twice s =
   let rec find p = function
@@ -46,15 +50,17 @@ let has_pair_twice s =
       else scan t
   in
   scan @@ List.of_string s
+;;
 
 let is_nice1 s =
   (has_vowels 3 s) && (has_doubled s) && not (has_forbidden s)
+;;
 
 let is_nice2 s =
   (has_repeated s) && (has_pair_twice s)
+;;
 
-
-let part1 =
+let part1 () =
   File.open_in "day5.input" (fun ch ->
     Stream.of_lines ch
     |> Stream.filter is_nice1
@@ -62,8 +68,9 @@ let part1 =
     |> List.length
     |> Printf.printf "part 1: %d nice words found\n"
   )
+;;
 
-let part2 =
+let part2 () =
   File.open_in "day5.input" (fun ch ->
     Stream.of_lines ch
     |> Stream.filter is_nice2
@@ -71,8 +78,7 @@ let part2 =
     |> List.length
     |> Printf.printf "part 2: %d nice words found\n"
   )
+;;
 
-
-let () =
-  part1;
-  part2;
+part1 ();;
+part2 ();;
