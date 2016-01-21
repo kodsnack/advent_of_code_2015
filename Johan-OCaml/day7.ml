@@ -86,4 +86,16 @@ let part1 () =
   )
 ;;
 
+let part2 () =
+  File.open_in "day7.input" (fun ch ->
+    Stream.of_lines ch
+    |> Stream.map parse_instruction
+    |> StringMap.from_stream
+    |> StringMap.add "b" (Equal(Value(3176)))
+    |> solve StringMap.empty
+    |> StringMap.find "a" |> Printf.printf "part 2: signal on a=%d\n"
+  )
+;;
+
 part1 ();;
+part2 ();;
