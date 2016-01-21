@@ -128,3 +128,30 @@ module Option = struct
   let is_none o = not @@ is_some o
   ;;
 end
+
+
+module Map = struct
+
+  module type S = sig
+    include Map.S
+    val keys: 'a t -> key list
+    val from_list: (key * 'a) list -> 'a t
+  end
+
+  module Make (Ord : Map.OrderedType) : S with type key = Ord.t = struct
+    module Map = Map.Make(Ord)
+    include Map
+
+    let keys m = Map.fold (fun k _ acc -> k :: acc) m [];;
+
+    let from_list l =
+      let rec build l m =
+        match l with
+        | [] -> m
+        | (k,v) :: t -> build t (Map.add k v m)
+      in
+      build l (Map.empty)
+    ;;
+  end
+
+end
