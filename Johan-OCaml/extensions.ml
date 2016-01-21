@@ -136,6 +136,7 @@ module Map = struct
     include Map.S
     val keys: 'a t -> key list
     val from_list: (key * 'a) list -> 'a t
+    val from_stream: (key * 'a) Stream.t -> 'a t
   end
 
   module Make (Ord : Map.OrderedType) : S with type key = Ord.t = struct
@@ -151,6 +152,16 @@ module Map = struct
         | (k,v) :: t -> build t (Map.add k v m)
       in
       build l (Map.empty)
+    ;;
+
+    let from_stream s =
+      let rec build s m =
+        try
+          let (k,v) = Stream.next s in
+          build s (Map.add k v m)
+        with Stream.Failure -> m
+      in
+      build s (Map.empty)
     ;;
   end
 

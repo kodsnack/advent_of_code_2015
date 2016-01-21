@@ -80,8 +80,7 @@ let part1 () =
   File.open_in "day7.input" (fun ch ->
     Stream.of_lines ch
     |> Stream.map parse_instruction
-    |> Stream.to_list
-    |> StringMap.from_list
+    |> StringMap.from_stream
     |> solve StringMap.empty
     |> StringMap.find "a" |> Printf.printf "part 1: signal on a=%d\n"
   )
