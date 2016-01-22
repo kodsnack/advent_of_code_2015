@@ -23,6 +23,10 @@ module String = struct
     build (String.length s) []
   ;;
 
+  let from_list chars =
+    String.init (List.length chars) (fun i -> List.nth chars i)
+  ;;
+
 end
 
 
@@ -110,6 +114,15 @@ module List = struct
 
   let of_string = String.to_list
   ;;
+
+  let skip n items =
+    let rec build n s =
+      if n = 0 then s
+      else build (n-1) (List.tl s)
+    in
+    build n items
+  ;;
+
 end
 
 module Option = struct
