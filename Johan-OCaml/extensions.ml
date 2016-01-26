@@ -123,6 +123,14 @@ module List = struct
     build n items
   ;;
 
+  let reduce f init items =
+    let rec build acc = function
+      | [] -> acc
+      | h :: t -> build (f h acc) t
+    in
+    build init items
+  ;;
+
 end
 
 module Option = struct
