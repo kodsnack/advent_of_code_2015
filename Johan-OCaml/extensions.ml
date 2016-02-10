@@ -77,10 +77,31 @@ module Stream = struct
     Stream.from next
   ;;
 
+  let collect p stream =
+    let rec next bag i =
+      try
+        let item = Stream.next stream in
+        if p item then next (item :: bag) i
+        else
+          match bag with
+          | [] -> next bag i
+          | _ -> Some(List.rev bag)
+      with Stream.Failure -> None
+    in
+    Stream.from (next [])
+  ;;
+
   let to_list stream =
     let list = ref [] in
     Stream.iter (fun v -> list := !list @ [v]) stream;
     !list
+  ;;
+
+  let skip n stream =
+    for _ = 1 to n do
+      Stream.junk stream
+    done;
+    stream
   ;;
 
 end
@@ -187,3 +208,192 @@ module Map = struct
   end
 
 end
+
+module Json = struct
+  module Lexer = struct
+    type token =
+      | String of string
+      | Number of float
+      | True | False
+      | Null
+      | BraceL | BraceR
+      | BracketL | BracketR
+      | Colon
+    ;;
+
+    let tokenize chars =
+      let parse_string chars =
+        let rec collect s =
+          match Stream.npeek 2 chars with
+          | [] -> failwith "Unexpected end of json string data"
+          | ['\\'; c] ->
+            chars |> Stream.skip 2 |> ignore;
+            let ec = match c with
+              | '"' -> '"'
+              | '\\' -> '\\'
+              | '/' -> '/'
+              | 'b' -> '\b'
+              | 'f' -> '\x0c'
+              | 'n' -> '\n'
+              | 'r' -> '\r'
+              | 't' -> '\t'
+              | _ -> failwith (Printf.sprintf "Unxpected escape sequence: \\%c" c)
+            in
+            collect (ec :: s)
+          | '"' :: _ -> chars |> Stream.skip 1 |> ignore; s |> List.rev |> String.from_list
+          | c :: _ -> chars |> Stream.skip 1 |> ignore; collect (c :: s)
+        in
+        collect []
+      in
+      let parse_number chars =
+        let rec collect digits chars =
+          match Stream.peek chars with
+          | None -> digits |> List.rev |> String.from_list |> float_of_string
+          | Some(d) ->
+            match d with
+            | '0'..'9' | '-' | '+' | '.' | 'e' | 'E' -> chars |> Stream.skip 1 |> collect (d :: digits)
+            | _ -> digits |> List.rev |> String.from_list |> float_of_string
+        in
+        collect [] chars
+      in
+      let rec tokenize tokens chars =
+        match Stream.peek chars with
+        | None -> tokens |> List.rev
+        | Some(c) ->
+          match c with
+          | '"' -> tokenize (String(chars |> Stream.skip 1 |> parse_string) :: tokens) chars
+          | ',' | ' ' | '\t' | '\n' -> chars |> Stream.skip 1 |> tokenize tokens
+          | 't' -> chars |> Stream.skip 4 |> tokenize (True :: tokens)
+          | 'f' -> chars |> Stream.skip 5 |> tokenize (False :: tokens)
+          | 'n' -> chars |> Stream.skip 4 |> tokenize (Null :: tokens)
+          | '0'..'9' | '-' -> tokenize (Number(chars |> parse_number) :: tokens) chars
+          | '[' -> chars |> Stream.skip 1 |> tokenize (BracketL :: tokens)
+          | ']' -> chars |> Stream.skip 1 |> tokenize (BracketR :: tokens)
+          | '{' -> chars |> Stream.skip 1 |> tokenize (BraceL :: tokens)
+          | '}' -> chars |> Stream.skip 1 |> tokenize (BraceR :: tokens)
+          | ':' -> chars |> Stream.skip 1 |> tokenize (Colon :: tokens)
+          | _ -> failwith (Printf.sprintf "Unexpected char: %c" c)
+      in
+      chars |> tokenize [] |> Stream.of_list
+    ;;
+
+    let to_string = function
+      | String(str) -> Printf.sprintf "\"%s\"" str
+      | Number(num) -> Printf.sprintf "%g" num
+      | True -> "true"
+      | False -> "false"
+      | Null -> "null"
+      | Colon -> ":"
+      | BraceL -> "{"
+      | BraceR -> "}"
+      | BracketL -> "["
+      | BracketR -> "]"
+    ;;
+  end
+
+  type json =
+    | Object of (string * json) list
+    | Array of json list
+    | String of string
+    | Number of float
+    | True
+    | False
+    | Null
+  ;;
+
+  let parse_stream stream =
+    let rec parse obj arr tokens =
+      match tokens |> Stream.npeek 3 with
+      | [Lexer.String(key); Lexer.Colon; token] ->
+        Stream.skip 3 tokens |> ignore;
+        begin match token with
+          | Lexer.String(str) -> tokens |> parse ((key, String(str)) :: obj) []
+          | Lexer.Number(num) -> tokens |> parse ((key, Number(num)) :: obj) []
+          | Lexer.True        -> tokens |> parse ((key, True) :: obj) []
+          | Lexer.False       -> tokens |> parse ((key, False) :: obj) []
+          | Lexer.Null        -> tokens |> parse ((key, Null) :: obj) []
+          | Lexer.BraceL | Lexer.BracketL ->
+            let element = (key, tokens |> parse [] []) in
+            begin match tokens |> Stream.peek with
+              | Some(_) -> tokens |> parse (element :: obj) []
+              | None    -> Object(element :: obj |> List.rev)
+            end
+          | _ -> failwith (Printf.sprintf "unexpected token encountered: %s" (Lexer.to_string token))
+        end
+      | token :: _ ->
+        Stream.skip 1 tokens |> ignore;
+        begin match token with
+          | Lexer.String(str) -> tokens |> parse [] (String(str) :: arr)
+          | Lexer.Number(num) -> tokens |> parse [] (Number(num) :: arr)
+          | Lexer.True        -> tokens |> parse [] (True :: arr)
+          | Lexer.False       -> tokens |> parse [] (False :: arr)
+          | Lexer.Null        -> tokens |> parse [] (Null :: arr)
+          | Lexer.BraceL | Lexer.BracketL ->
+            let element = tokens |> parse [] [] in
+            begin match tokens |> Stream.peek with
+              | Some(_) -> tokens |> parse [] (element :: arr)
+              | None    -> element
+            end
+          | Lexer.BraceR      -> Object(obj |> List.rev)
+          | Lexer.BracketR    -> Array(arr |> List.rev)
+          | _ -> failwith (Printf.sprintf "unexpected token encountered: %s" (Lexer.to_string token))
+        end
+      | [] -> failwith "unexpected end of json structure"
+    in
+    stream |> Lexer.tokenize |> parse [] []
+  ;;
+
+  let parse str = str |> Stream.of_string |> parse_stream;;
+
+  let rec to_string json =
+    let join f arr =
+      let rec join acc = function
+        | [] -> acc
+        | h :: t -> join (acc ^ "," ^ f h) t
+      in
+      match arr with
+      | [] -> ""
+      | [h] -> f h
+      | h :: t -> join (f h) t
+    in
+    match json with
+    | Array(arr) -> arr |> List.map to_string |> join (fun s -> s) |> Printf.sprintf "[%s]"
+    | Object(obj) -> obj |> List.map (fun (k, o) -> (k, to_string o)) |> join (fun (k, v) -> Printf.sprintf "\"%s\":%s" k v) |> Printf.sprintf "{%s}"
+    | String(str) -> Printf.sprintf "\"%s\"" str
+    | Number(num) -> Printf.sprintf "%g" num
+    | True -> "true"
+    | False -> "false"
+    | Null -> "null"
+  ;;
+
+
+  module Tests = struct
+    let expect p m =
+      let actual, expected = p () in
+      if actual = expected then Printf.printf "passed: %s\n" m
+      else Printf.printf "failed: %s\n expected: %s\n      was: %s\n" m (expected |> to_string) (actual |> to_string)
+    ;;
+
+    let to_string () =
+      "[\"a\",\"b\",true,false,\"c\",null,42,[1,2,3]]"
+      |> parse
+      |> to_string
+      |> print_endline
+    ;;
+
+    let all () =
+      to_string ();
+      "array: empty" |> expect (fun () -> "[]" |> parse, Array([]));
+      "array: with values" |> expect (fun () -> "[1,true,null,[]]" |> parse, Array([Number(1.); True; Null; Array([])]));
+      "array: with an array" |> expect (fun () -> "[[1],[[2]],3]" |> parse, Array([Array([Number(1.)]); Array([Array([Number(2.)])]); Number(3.)]));
+      "array: with an object" |> expect (fun () -> "[{\"key\":42}]" |> parse, Array([Object(["key", Number(42.)])]));
+      "object: object" |> expect (fun () -> "{}" |> parse, Object([]));
+      "object: with a key" |> expect (fun () -> "{\"key\":42}" |> parse, Object(["key",Number(42.)]));
+      "object: with an array" |> expect (fun () -> "{\"key\":[42]}" |> parse, Object(["key", Array([Number(42.)])]));
+      "object: with an object" |> expect (fun () -> "{\"key\":{\"nested\":[42]}}" |> parse, Object(["key", Object(["nested", Array([Number(42.)])])]));
+      "string: with escapes" |> expect (fun () -> "[\"a\\\"b\\\"c\"]" |> parse, Array([String("a\"b\"c")]));
+    ;;
+  end
+
+end
+;;
