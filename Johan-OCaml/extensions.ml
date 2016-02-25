@@ -1,3 +1,54 @@
+module Math = struct
+
+  let rec fact n =
+    if n = 0 then 1
+    else n * (fact (n - 1))
+  ;;
+
+  let rec pow x n =
+    if n = 0 then 1
+    else x * (pow x (n - 1))
+  ;;
+
+end
+
+let ( **. ) = Pervasives.( ** );;
+let ( ** ) = Math.pow;;
+let ( !! ) = Math.fact;;
+
+
+module LazyList = struct
+
+  type 'a lazylist =
+    | Nil
+    | Cons of 'a * (unit -> 'a lazylist)
+  ;;
+
+  let hd = function
+    | Nil -> failwith "hd - empty lazylist"
+    | Cons(x, _) -> x
+  ;;
+
+  let tl = function
+    | Nil -> failwith "tl - empty lazylist"
+    | Cons(_, t) -> t ()
+  ;;
+
+  let rec take n l =
+    if n = 0 then []
+    else match l with
+      | Nil -> []
+      | _ -> hd l :: (tl l |> take (n - 1))
+  ;;
+
+  let rec iter f = function
+    | Nil -> ()
+    | Cons(h, t) -> f h; iter f (t ())
+  ;;
+
+end
+
+
 module File = struct
 
   let open_in filename fn =
@@ -67,6 +118,17 @@ module Stream = struct
     !result
   ;;
 
+  let maxf f stream =
+    let rec search max =
+      match Stream.peek stream with
+      | None -> max
+      | Some(x) ->
+        Stream.junk stream;
+        let max' = Pervasives.max max (f x) in search max'
+    in
+    search (f (Stream.next stream))
+  ;;
+
   let filter p stream =
     let rec next i =
       try
@@ -104,6 +166,42 @@ module Stream = struct
     stream
   ;;
 
+  let take n stream =
+    let rec take i =
+      if i = n then None
+      else Some(Stream.next stream)
+    in
+    Stream.from take
+  ;;
+
+  let concat s1 s2 =
+    let rec concat i =
+      begin match Stream.peek s1 with
+      | None ->
+        begin match Stream.peek s2 with
+        | None -> None
+        | Some _ -> Some(Stream.next s2)
+        end
+      | Some _ -> Some(Stream.next s1)
+      end
+    in
+    Stream.from concat
+  ;;
+
+  let flatten streams =
+    let lst = ref [] in
+    let rec flatten i =
+      match !lst with
+      | [] ->
+        begin match Stream.peek streams with
+        | None -> None
+        | Some _ -> lst := Stream.next streams; flatten i
+        end
+      | h :: t -> lst := t; Some(h)
+    in
+    Stream.from flatten
+  ;;
+
 end
 
 
@@ -124,11 +222,19 @@ module List = struct
   ;;
 
   let max items =
-    let rec search items =
-      match items with
-      | [] -> failwith "max requires a non-empty list"
+    let rec search = function
+      | [] -> failwith "a non-empty list is required"
       | [x] -> x
-      | x :: tail -> max x @@ search tail
+      | x :: tail -> Pervasives.max x (search tail)
+    in
+    search items
+  ;;
+
+  let maxf f items =
+    let rec search = function
+      | [] -> failwith "a non-empty list is required"
+      | [x] -> f x
+      | x :: tail -> Pervasives.max (f x) (search tail)
     in
     search items
   ;;
@@ -152,7 +258,16 @@ module List = struct
     build init items
   ;;
 
+  let rec remove xs x =
+    match xs with
+    | [] -> []
+    | x' :: xs' ->
+      if x = x' then xs'
+      else x' :: (remove xs' x)
+  ;;
 end
+
+let ( -- ) = List.remove;;
 
 module Option = struct
   let value_of o =
