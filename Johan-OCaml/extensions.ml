@@ -118,15 +118,23 @@ module Stream = struct
     !result
   ;;
 
-  let maxf f stream =
-    let rec search max =
+  let max stream =
+    let rec search mx =
       match Stream.peek stream with
-      | None -> max
-      | Some(x) ->
-        Stream.junk stream;
-        let max' = Pervasives.max max (f x) in search max'
+      | None    -> mx
+      | Some(x) -> Stream.junk stream; search (Pervasives.max mx x)
     in
-    search (f (Stream.next stream))
+    search (Stream.next stream)
+  ;;
+
+  let maxf f stream =
+    let maxf a b = if f a > f b then a else b in
+    let rec search mx =
+      match Stream.peek stream with
+      | None    -> mx
+      | Some(x) -> Stream.junk stream; search (maxf mx x)
+    in
+    search (Stream.next stream)
   ;;
 
   let filter p stream =
@@ -230,13 +238,15 @@ module List = struct
     search items
   ;;
 
-  let maxf f items =
-    let rec search = function
-      | [] -> failwith "a non-empty list is required"
-      | [x] -> f x
-      | x :: tail -> Pervasives.max (f x) (search tail)
+  let maxf f xs =
+    let maxf a b = if f a > f b then a else b in
+    let rec search mx = function
+      | [] -> mx
+      | x :: xs -> search (maxf mx x) xs
     in
-    search items
+    match xs with
+    | [] -> failwith "a non-empty list is required"
+    | x :: xs -> search x xs
   ;;
 
   let of_string = String.to_list

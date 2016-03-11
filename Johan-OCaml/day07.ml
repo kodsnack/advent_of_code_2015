@@ -77,7 +77,7 @@ let parse_instruction line =
 ;;
 
 let part1 () =
-  File.open_in "day7.input" (fun ch ->
+  File.open_in "day07.input" (fun ch ->
     Stream.of_lines ch
     |> Stream.map parse_instruction
     |> StringMap.from_stream
@@ -87,7 +87,7 @@ let part1 () =
 ;;
 
 let part2 () =
-  File.open_in "day7.input" (fun ch ->
+  File.open_in "day07.input" (fun ch ->
     Stream.of_lines ch
     |> Stream.map parse_instruction
     |> StringMap.from_stream

@@ -28,7 +28,7 @@ let ribbon_length_for b =
 ;;
 
 let part1 () =
-  File.open_in "day2.input" (fun ch ->
+  File.open_in "day02.input" (fun ch ->
     Stream.of_lines ch
     |> Stream.map parse_box
     |> Stream.map area_of
@@ -38,7 +38,7 @@ let part1 () =
 ;;
 
 let part2 () =
-  File.open_in "day2.input" (fun ch ->
+  File.open_in "day02.input" (fun ch ->
     Stream.of_lines ch
     |> Stream.map parse_box
     |> Stream.map ribbon_length_for

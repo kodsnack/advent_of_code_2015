@@ -78,7 +78,8 @@ let permutations seating =
 
 let optimize seating rules =
   permutations seating
-  |> Stream.maxf (eval rules)
+  |> Stream.map (eval rules)
+  |> Stream.max
 ;;
 
 

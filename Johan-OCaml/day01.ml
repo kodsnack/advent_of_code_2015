@@ -8,7 +8,7 @@ let up_or_down ch =
 ;;
 
 let part1 () =
-  File.open_in "day1.input" (fun ch ->
+  File.open_in "day01.input" (fun ch ->
     Stream.of_chars ch
     |> Stream.map up_or_down
     |> Stream.fold ( + ) 0
@@ -17,7 +17,7 @@ let part1 () =
 ;;
 
 let part2 () =
-  File.open_in "day1.input" (fun ch ->
+  File.open_in "day01.input" (fun ch ->
     let rec walk_to_basement floor steps stream =
       if floor = -1 then
         Printf.printf "part 2: reached basement in %d step(s)\n" steps

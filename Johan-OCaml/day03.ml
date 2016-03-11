@@ -38,7 +38,7 @@ let deliver2 instructions =
 ;;
 
 let part1 () =
-  File.open_in "day3.input" (fun ch ->
+  File.open_in "day03.input" (fun ch ->
     Stream.of_chars ch
     |> deliver
     |> Houses.cardinal
@@ -47,7 +47,7 @@ let part1 () =
 ;;
 
 let part2 () =
-  File.open_in "day3.input" (fun ch ->
+  File.open_in "day03.input" (fun ch ->
     Stream.of_chars ch
     |> deliver2
     |> Houses.cardinal

@@ -66,7 +66,7 @@ let part2_test () =
 ;;
 
 let part1 () =
-  File.open_in "day9.input" (fun ch ->
+  File.open_in "day09.input" (fun ch ->
     Stream.of_lines ch
     |> Stream.fold parse StringMap.empty
     |> determine shortest
@@ -75,7 +75,7 @@ let part1 () =
 ;;
 
 let part2 () =
-  File.open_in "day9.input" (fun ch ->
+  File.open_in "day09.input" (fun ch ->
     Stream.of_lines ch
     |> Stream.fold parse StringMap.empty
     |> determine longest

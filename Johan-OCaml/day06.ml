@@ -34,7 +34,7 @@ let execute1 ins lights =
 ;;
 
 let part1 () =
-  File.open_in "day6.input" (fun ch ->
+  File.open_in "day06.input" (fun ch ->
     Stream.of_lines ch
     |> Stream.map parse_instruction
     |> Stream.fold execute1 (Array.make (1000*1000) 0)
@@ -51,7 +51,7 @@ let execute2 ins lights =
 ;;
 
 let part2 () =
-  File.open_in "day6.input" (fun ch ->
+  File.open_in "day06.input" (fun ch ->
     Stream.of_lines ch
     |> Stream.map parse_instruction
     |> Stream.fold execute2 (Array.make (1000*1000) 0)

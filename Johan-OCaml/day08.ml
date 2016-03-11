@@ -63,7 +63,7 @@ let test2 () =
 
 let part1 () =
   print_string "part1: ";
-  File.open_in "day8.input" (fun ch ->
+  File.open_in "day08.input" (fun ch ->
     Stream.of_lines ch
     |> count_decoded
   )
@@ -71,7 +71,7 @@ let part1 () =
 
 let part2 () =
   print_string "part2: ";
-  File.open_in "day8.input" (fun ch ->
+  File.open_in "day08.input" (fun ch ->
     Stream.of_lines ch
     |> count_encoded
   )
