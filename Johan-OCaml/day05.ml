@@ -44,6 +44,7 @@ let has_pair_twice s =
       else find p t
   in
   let rec scan = function
+    | [] | _ :: [] -> false
     | x when List.length x < 4 -> false
     | h :: (h' :: t' as t) ->
       if find (h, h') t' then true
@@ -61,7 +62,7 @@ let is_nice2 s =
 ;;
 
 let part1 () =
-  File.open_in "day5.input" (fun ch ->
+  File.open_in "day05.input" (fun ch ->
     Stream.of_lines ch
     |> Stream.filter is_nice1
     |> Stream.to_list
@@ -71,7 +72,7 @@ let part1 () =
 ;;
 
 let part2 () =
-  File.open_in "day5.input" (fun ch ->
+  File.open_in "day05.input" (fun ch ->
     Stream.of_lines ch
     |> Stream.filter is_nice2
     |> Stream.to_list

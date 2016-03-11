@@ -118,11 +118,20 @@ module Stream = struct
     !result
   ;;
 
+  let max stream =
+    let rec search mx =
+      match Stream.peek stream with
+      | None    -> mx
+      | Some(x) -> Stream.junk stream; search (Pervasives.max mx x)
+    in
+    search (Stream.next stream)
+  ;;
+
   let maxf f stream =
     let maxf a b = if f a > f b then a else b in
     let rec search mx =
       match Stream.peek stream with
-      | None -> mx
+      | None    -> mx
       | Some(x) -> Stream.junk stream; search (maxf mx x)
     in
     search (Stream.next stream)
