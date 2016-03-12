@@ -15,7 +15,10 @@ namespace Adventofcode
             Day6.Run();
             Day7.Run();
             Day8();*/
-            Day9.Run();
+            //Day9.Run();
+            //Day10();
+            //Day11.Run();
+            Day12.Run();
             Console.WriteLine("Färdig!");
             Console.ReadKey();
 
@@ -65,5 +68,34 @@ namespace Adventofcode
             Console.WriteLine("Difference " + (charCountNew - totalChars));
 
         }
+
+        static void Day10()
+        {
+            //var input = "1";
+            var input = "1113222113";
+            const int NumLoops = 50;
+
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            var currentString = input;
+            for(int i = 0; i < NumLoops; i++)
+            {
+                sb.Clear();
+                for (int j = 0; j < currentString.Length; j++)
+                {
+                    int count = 1;
+                    char currentDigit = currentString[j];
+                    while(j < currentString.Length - 1 && currentString[j+1] == currentDigit)
+                    {
+                        count++;
+                        j++;
+                    }
+                    sb.Append(count);
+                    sb.Append(currentDigit);
+                }
+                currentString = sb.ToString();
+            }
+            Console.WriteLine("Length of results: " + currentString.Length);
+        }
+
     }
 }
