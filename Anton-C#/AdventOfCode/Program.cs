@@ -16,7 +16,9 @@ namespace Adventofcode
             Day7.Run();
             Day8();*/
             //Day9.Run();
-            Day10();
+            //Day10();
+            //Day11.Run();
+            Day12.Run();
             Console.WriteLine("Färdig!");
             Console.ReadKey();
 
@@ -93,7 +95,7 @@ namespace Adventofcode
                 currentString = sb.ToString();
             }
             Console.WriteLine("Length of results: " + currentString.Length);
-
         }
+
     }
 }
