@@ -7,3 +7,5 @@ För att kompilera en Kotlin-fil med tester:
 Kör sedan testerna med:
 
 `kotlin -cp day01.jar:../../../lib/junit-4.10.jar  org.junit.runner.JUnitCore DayOne`
+
+Eller skapa ett projekt i IntelliJ IDEA samt en JUnit run configuration.
