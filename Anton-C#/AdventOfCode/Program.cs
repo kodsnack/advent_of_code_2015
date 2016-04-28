@@ -21,7 +21,9 @@ namespace Adventofcode
             //Day12.Run();
             //Day13.Run();
             //Day14.Run();
-            Day15.Run();
+            //Day15.Run();
+            Day16();
+            Day17.Run();
             Console.WriteLine("Färdig!");
             Console.ReadKey();
 
