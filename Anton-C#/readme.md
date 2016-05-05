@@ -1,5 +1,7 @@
-**Lösningar i C#**
+﻿**Lösningar i C#**
 
 Kompilerat med Visual Studio Community 2015
 
-// Anton, en amatör som försöker lära sig lite C#
+Se till att körmappen är den med input-filerna
+
+// Anton, försöker lära sig lite C#
