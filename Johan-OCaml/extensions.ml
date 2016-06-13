@@ -17,33 +17,81 @@ let ( ** ) = Math.pow;;
 let ( !! ) = Math.fact;;
 
 
-module LazyList = struct
+module Seq = struct
 
-  type 'a lazylist =
-    | Nil
-    | Cons of 'a * (unit -> 'a lazylist)
+  type 'a seq =
+    | Empty
+    | Element of 'a * (unit -> 'a seq)
+  ;;
+
+  let empty = Empty;;
+
+  let rec unfold f state =
+    match f state with
+    | None -> Empty
+    | Some(e, state') -> Element(e, fun () -> unfold f state')
   ;;
 
   let hd = function
-    | Nil -> failwith "hd - empty lazylist"
-    | Cons(x, _) -> x
+    | Empty -> failwith "hd - empty sequence"
+    | Element(e, _) -> e
   ;;
 
   let tl = function
-    | Nil -> failwith "tl - empty lazylist"
-    | Cons(_, t) -> t ()
-  ;;
-
-  let rec take n l =
-    if n = 0 then []
-    else match l with
-      | Nil -> []
-      | _ -> hd l :: (tl l |> take (n - 1))
+    | Empty -> failwith "tl - empty sequence"
+    | Element(_, seq) -> seq ()
   ;;
 
   let rec iter f = function
-    | Nil -> ()
-    | Cons(h, t) -> f h; iter f (t ())
+    | Empty -> ()
+    | Element(e, seq) -> f e; iter f (seq ())
+  ;;
+
+  let rec map f = function
+    | Empty -> Empty
+    | Element(e, seq) -> Element(f e, fun () -> map f (seq ()))
+  ;;
+
+  let rec filter p = function
+    | Empty -> Empty
+    | Element(e, seq) ->
+      if p e then Element(e, fun () -> filter p (seq ()))
+      else filter p (seq ())
+  ;;
+
+  let rec take_while p = function
+    | Empty -> Empty
+    | Element(e, seq) ->
+      if p e then Element(e, fun () -> take_while p (seq ()))
+      else Empty
+  ;;
+
+  let rec take n = function
+    | Empty -> Empty
+    | Element(e, seq) ->
+      if n = 0 then Empty
+      else Element(e, fun () -> take (n - 1) (seq ()))
+  ;;
+
+  let rec skip_while p = function
+    | Empty -> Empty
+    | Element(e, seq) as elm ->
+      if not (p e) then elm
+      else skip_while p (seq ())
+  ;;
+
+  let rec skip n = function
+    | Empty -> Empty
+    | Element(e, seq) as elm ->
+      if n = 0 then elm
+      else skip (n - 1) (seq ())
+  ;;
+
+  let max seq =
+    let max = ref (hd seq) in
+    let maxf x = if x > !max then max := x in
+    iter maxf (seq |> tl);
+    !max
   ;;
 
 end
@@ -96,7 +144,7 @@ module Stream = struct
 
   let map f stream =
     let rec next i =
-      try Some (f @@ Stream.next stream)
+      try Some (f (Stream.next stream))
       with Stream.Failure -> None
     in
     Stream.from next
@@ -122,7 +170,8 @@ module Stream = struct
     let rec search mx =
       match Stream.peek stream with
       | None    -> mx
-      | Some(x) -> Stream.junk stream; search (Pervasives.max mx x)
+      | Some(x) ->
+        Stream.junk stream; search (Pervasives.max mx x)
     in
     search (Stream.next stream)
   ;;
@@ -165,6 +214,10 @@ module Stream = struct
     let list = ref [] in
     Stream.iter (fun v -> list := !list @ [v]) stream;
     !list
+  ;;
+
+  let to_array stream =
+    stream |> to_list |> Array.of_list
   ;;
 
   let skip n stream =
