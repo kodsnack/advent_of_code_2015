@@ -102,8 +102,9 @@ module File = struct
   let open_in filename fn =
     let ch = open_in filename in
     try
-      fn ch;
-      close_in ch
+      let res = fn ch in
+      close_in ch;
+      res
     with e ->
       close_in ch;
       raise e
