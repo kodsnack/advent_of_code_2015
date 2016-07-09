@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Adventofcode
+namespace AdventOfCode
 {
     partial class Program
     {

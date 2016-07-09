@@ -4,7 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Adventofcode
+namespace AdventOfCode
 {
     partial class Program
     {
