@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Adventofcode
+namespace AdventOfCode
 {
     partial class Program
     {
@@ -27,8 +27,9 @@ namespace Adventofcode
             //Day19.Run();
             //Day20();
             //Day21.Run();
-            Day22.Run();
-            Day23.Run();
+            //Day22.Run();
+            //Day23.Run();
+            Day24.Run();
             Console.WriteLine("Färdig!");
             Console.ReadKey();
         }
