@@ -1,4 +1,4 @@
-﻿==Lösningar för alla dagar i C#==
+**Lösningar för alla dagar i C#**
 
 Kompilerat med Visual Studio Community 2015, se till att körmappen är den med input-filerna.
 
