@@ -75,8 +75,12 @@ namespace AdventOfCode
                     sb.Append(currentDigit);
                 }
                 currentString = sb.ToString();
+                if(i == 39)
+                {
+                    Console.WriteLine("Length of results, part 1: " + currentString.Length);
+                }
             }
-            Console.WriteLine("Length of results: " + currentString.Length);
+            Console.WriteLine("Length of results, part 2: " + currentString.Length);
         }
         static void Day20()
         {

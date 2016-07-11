@@ -47,7 +47,7 @@ namespace AdventOfCode
                         {
                             solutions.Add(getQE(presents, group1));
 
-                            PrintCombination(presents, group1);
+                            //PrintCombination(presents, group1);
                             //PrintCombination(remainingPresents, testGroups2[0]);
                             //Console.WriteLine("");
                             solutionFound = true;
@@ -104,7 +104,7 @@ namespace AdventOfCode
                                     if (testGroups2.Count > 0)
                                     {
                                         solutions.Add(getQE(presents, group1));
-                                        PrintCombination(presents, group1);
+                                        //PrintCombination(presents, group1);
                                         //PrintCombination(remainingPresents, testGroups2[0]);
                                         //Console.WriteLine("");
                                         solutionFound = true;

@@ -125,6 +125,7 @@ namespace AdventOfCode
             MD5 md5Hash = MD5.Create();
             StringBuilder stringBuilder = new StringBuilder();
             int number = -1;
+            bool part1SolutionFound = false;
             while (true)
             {
                 number++;
@@ -135,9 +136,14 @@ namespace AdventOfCode
                 {
                     stringBuilder.Append(hashBytes[i].ToString("x2"));
                 }
+                if (!part1SolutionFound && stringBuilder.ToString().StartsWith("00000"))
+                {
+                    Console.WriteLine("Answer, part 1: " + number);
+                    part1SolutionFound = true;
+                }
                 if (stringBuilder.ToString().StartsWith("000000"))
                 {
-                    Console.WriteLine("Day4 Answer: " + number);
+                    Console.WriteLine("Answer, part 2: " + number);
                     break;
                 }
 
