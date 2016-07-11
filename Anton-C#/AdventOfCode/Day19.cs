@@ -72,7 +72,7 @@ namespace AdventOfCode
                 int num = GetNumMatching(m, target);
                 if (maxMatching - num < SPECIAL_VARIABLE && m.Length <= target.Length) newMolecules.Add(m);
             }
-            Console.WriteLine("Num matching " + maxMatching);
+            //Console.WriteLine("Num matching " + maxMatching);
             Day19.maxMatching = maxMatching;
             return newMolecules;
         }
@@ -120,7 +120,7 @@ namespace AdventOfCode
                 counter++;
                 currentMolecules = GenerateMolecules(currentMolecules, true);
                 currentMolecules = filterMolecules(currentMolecules, medicineMolecule);
-                Console.WriteLine("Step " + counter + ", number of molecules: " + currentMolecules.Count);
+                //Console.WriteLine("Step " + counter + ", number of molecules: " + currentMolecules.Count);
             }
             Console.WriteLine("Number of steps: " + counter);
         }
