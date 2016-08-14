@@ -1,26 +1,19 @@
 buildscript {
-    ext.kotlin_version = '1.0.1-2'
+    ext.kotlin_version = '1.0.3'
 
     repositories {
         mavenCentral()
         jcenter()
-        maven {
-            url "https://dl.bintray.com/kotlin/kotlin-eap"
-        }
     }
 
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
     }
 }
 
 repositories {
     mavenCentral()
     jcenter()
-    maven {
-        url "https://dl.bintray.com/kotlin/kotlin-eap"
-    }
 }
 
 apply plugin: 'kotlin'

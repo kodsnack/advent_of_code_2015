@@ -12,7 +12,7 @@ class DayOne {
         assert(partOneResult == 232)
     }
 
-    fun partOne() : Int{
+    fun partOne() : Int {
         val floors = loadInputAsLines(filename, filepath)
         var sum = 0
         floors.forEach {
