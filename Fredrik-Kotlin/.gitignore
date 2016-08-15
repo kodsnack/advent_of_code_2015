@@ -2,3 +2,5 @@
 *.iml
 out
 day*.jar
+build/
+.gradle/

@@ -1,19 +1,19 @@
-import java.io.FileInputStream
-import java.io.InputStreamReader
+package test.day01
 
-import junit.framework.Assert
 import org.junit.Test
-import java.io.File
-import java.io.FileNotFoundException
+import test.util.loadInputAsLines
 
 class DayOne {
+    val filename = "day01.input"
+    val filepath = "src/test/kotlin/day01/" + filename
+
     @Test fun test_partOne() {
         val partOneResult = partOne()
         assert(partOneResult == 232)
     }
 
-    fun partOne() : Int{
-        val floors = loadInput()
+    fun partOne() : Int {
+        val floors = loadInputAsLines(filename, filepath)
         var sum = 0
         floors.forEach {
             sum += it.toFloor()
@@ -27,7 +27,7 @@ class DayOne {
     }
 
     fun partTwo() : Int {
-        val floors = loadInput()
+        val floors = loadInputAsLines(filename, filepath)
         var sum = 0
         // Index 0 equals Floor 1
         val positionOffset = 1
@@ -39,27 +39,6 @@ class DayOne {
         }
         return 0
     }
-}
-
-fun loadInput() : String {
-    val filename = "day01.input"
-    val filepath = "src/test/day01/" + filename
-    var inputFile: File
-    when {
-        File(filename).exists() -> inputFile = File(filename)
-        File(filepath).exists() -> inputFile = File(filepath)
-        else -> throw FileNotFoundException("$filename nor $filepath was found")
-    }
-
-    val fis = FileInputStream(inputFile).buffered()
-    var floors = ""
-    try {
-        val isr = InputStreamReader(fis)
-        isr.readLines().forEach { floors += it }
-    } finally {
-        fis.close()
-    }
-    return floors
 }
 
 fun Char.toFloor() : Int {
