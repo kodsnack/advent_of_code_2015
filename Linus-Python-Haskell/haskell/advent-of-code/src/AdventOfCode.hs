@@ -18,6 +18,7 @@ import Day14
 import Day15
 import Day16
 import Day17
+import Day18
 
 type InputFile = String
 type Day = String
@@ -51,6 +52,10 @@ problems =
                  , Problem { inputFile = "day17-input.txt", solution = day17_1})
                , ("day17-2"
                  , Problem { inputFile = "day17-input.txt", solution = day17_2})
+               , ("day18-1"
+                 , Problem { inputFile = "day18-input.txt", solution = day18_1})
+               , ("day18-2"
+                 , Problem { inputFile = "day18-input.txt", solution = day18_2})
                ]
 
 lookupProblem day = Map.lookup day problems
