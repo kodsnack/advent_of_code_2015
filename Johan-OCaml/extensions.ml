@@ -273,6 +273,16 @@ module List = struct
   let keep = List.filter
   ;;
 
+  let filteri p items =
+    let rec search i matching = function
+      | [] -> matching
+      | x :: items' ->
+        if p i x then search (i + 1) (x :: matching) items'
+        else search (i + 1) matching items'
+    in
+    search 0 [] items |> List.rev
+  ;;
+
   let min items =
     let rec search items =
       match items with
@@ -290,6 +300,17 @@ module List = struct
       | x :: tail -> Pervasives.max x (search tail)
     in
     search items
+  ;;
+
+  let minf f xs =
+    let minf a b = if f a < f b then a else b in
+    let rec search mx = function
+      | [] -> mx
+      | x :: xs -> search (minf mx x) xs
+    in
+    match xs with
+    | [] -> failwith "a non-empty list is required"
+    | x :: xs -> search x xs
   ;;
 
   let maxf f xs =
@@ -329,6 +350,7 @@ module List = struct
       if x = x' then xs'
       else x' :: (remove xs' x)
   ;;
+
 end
 
 let ( -- ) = List.remove;;
@@ -575,4 +597,3 @@ module Json = struct
   end
 
 end
-;;
