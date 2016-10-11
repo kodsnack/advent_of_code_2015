@@ -59,6 +59,13 @@ module Seq = struct
       else filter p (seq ())
   ;;
 
+  let rec find p = function
+    | Empty -> None
+    | Element(e, seq) ->
+      if p e then Some(e)
+      else find p (seq ())
+  ;;
+
   let rec take_while p = function
     | Empty -> Empty
     | Element(e, seq) ->
