@@ -32,6 +32,32 @@ module Seq = struct
     | Some(e, state') -> Element(e, fun () -> unfold f state')
   ;;
 
+  let of_list = function
+    | [] -> Empty
+    | lst -> unfold (function [] -> None | hd :: tl -> Some (hd, tl)) lst
+  ;;
+
+	let range s e =
+		unfold (function n when n <= e -> Some (n, n + 1) | _ -> None) s
+	;;
+
+  let to_list =
+    let rec to_list lst = function
+      | Empty -> lst |> List.rev
+      | Element (e, seq) -> to_list (e :: lst) (seq ())
+    in
+    to_list []
+  ;;
+
+	let rec flatten = function
+		| Empty -> Empty
+		| Element (seq, next) ->
+			let rec unwind = function
+			| Empty -> flatten (next ())
+			| Element (e, next') -> Element (e, fun () -> unwind (next' ()))
+			in unwind seq
+	;;
+  
   let hd = function
     | Empty -> failwith "hd - empty sequence"
     | Element(e, _) -> e
@@ -92,6 +118,13 @@ module Seq = struct
     | Element(e, seq) as elm ->
       if n = 0 then elm
       else skip (n - 1) (seq ())
+  ;;
+
+  let min seq =
+    let min = ref (hd seq) in
+    let minf x = if x < !min then min := x in
+    iter minf (seq |> tl);
+    !min
   ;;
 
   let max seq =
@@ -356,6 +389,16 @@ module List = struct
     | x' :: xs' ->
       if x = x' then xs'
       else x' :: (remove xs' x)
+  ;;
+
+  let rol = function
+    | [] -> []
+    | x :: xs ->
+      let rec rol = function
+        | [] -> [x]
+        | hd :: tl -> hd :: rol tl
+      in
+      rol xs
   ;;
 
 end
