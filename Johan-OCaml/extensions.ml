@@ -17,33 +17,121 @@ let ( ** ) = Math.pow;;
 let ( !! ) = Math.fact;;
 
 
-module LazyList = struct
+module Seq = struct
 
-  type 'a lazylist =
-    | Nil
-    | Cons of 'a * (unit -> 'a lazylist)
+  type 'a seq =
+    | Empty
+    | Element of 'a * (unit -> 'a seq)
   ;;
 
+  let empty = Empty;;
+
+  let rec unfold f state =
+    match f state with
+    | None -> Empty
+    | Some(e, state') -> Element(e, fun () -> unfold f state')
+  ;;
+
+  let of_list = function
+    | [] -> Empty
+    | lst -> unfold (function [] -> None | hd :: tl -> Some (hd, tl)) lst
+  ;;
+
+	let range s e =
+		unfold (function n when n <= e -> Some (n, n + 1) | _ -> None) s
+	;;
+
+  let to_list =
+    let rec to_list lst = function
+      | Empty -> lst |> List.rev
+      | Element (e, seq) -> to_list (e :: lst) (seq ())
+    in
+    to_list []
+  ;;
+
+	let rec flatten = function
+		| Empty -> Empty
+		| Element (seq, next) ->
+			let rec unwind = function
+			| Empty -> flatten (next ())
+			| Element (e, next') -> Element (e, fun () -> unwind (next' ()))
+			in unwind seq
+	;;
+  
   let hd = function
-    | Nil -> failwith "hd - empty lazylist"
-    | Cons(x, _) -> x
+    | Empty -> failwith "hd - empty sequence"
+    | Element(e, _) -> e
   ;;
 
   let tl = function
-    | Nil -> failwith "tl - empty lazylist"
-    | Cons(_, t) -> t ()
-  ;;
-
-  let rec take n l =
-    if n = 0 then []
-    else match l with
-      | Nil -> []
-      | _ -> hd l :: (tl l |> take (n - 1))
+    | Empty -> failwith "tl - empty sequence"
+    | Element(_, seq) -> seq ()
   ;;
 
   let rec iter f = function
-    | Nil -> ()
-    | Cons(h, t) -> f h; iter f (t ())
+    | Empty -> ()
+    | Element(e, seq) -> f e; iter f (seq ())
+  ;;
+
+  let rec map f = function
+    | Empty -> Empty
+    | Element(e, seq) -> Element(f e, fun () -> map f (seq ()))
+  ;;
+
+  let rec filter p = function
+    | Empty -> Empty
+    | Element(e, seq) ->
+      if p e then Element(e, fun () -> filter p (seq ()))
+      else filter p (seq ())
+  ;;
+
+  let rec find p = function
+    | Empty -> None
+    | Element(e, seq) ->
+      if p e then Some(e)
+      else find p (seq ())
+  ;;
+
+  let rec take_while p = function
+    | Empty -> Empty
+    | Element(e, seq) ->
+      if p e then Element(e, fun () -> take_while p (seq ()))
+      else Empty
+  ;;
+
+  let rec take n = function
+    | Empty -> Empty
+    | Element(e, seq) ->
+      if n = 0 then Empty
+      else Element(e, fun () -> take (n - 1) (seq ()))
+  ;;
+
+  let rec skip_while p = function
+    | Empty -> Empty
+    | Element(e, seq) as elm ->
+      if not (p e) then elm
+      else skip_while p (seq ())
+  ;;
+
+  let rec skip n = function
+    | Empty -> Empty
+    | Element(e, seq) as elm ->
+      if n = 0 then elm
+      else skip (n - 1) (seq ())
+  ;;
+
+  let min seq =
+    let min = ref (hd seq) in
+    let minf x = if x < !min then min := x in
+    iter minf (seq |> tl);
+    !min
+  ;;
+
+  let max seq =
+    let max = ref (hd seq) in
+    let maxf x = if x > !max then max := x in
+    iter maxf (seq |> tl);
+    !max
   ;;
 
 end
@@ -54,8 +142,9 @@ module File = struct
   let open_in filename fn =
     let ch = open_in filename in
     try
-      fn ch;
-      close_in ch
+      let res = fn ch in
+      close_in ch;
+      res
     with e ->
       close_in ch;
       raise e
@@ -96,7 +185,7 @@ module Stream = struct
 
   let map f stream =
     let rec next i =
-      try Some (f @@ Stream.next stream)
+      try Some (f (Stream.next stream))
       with Stream.Failure -> None
     in
     Stream.from next
@@ -122,7 +211,8 @@ module Stream = struct
     let rec search mx =
       match Stream.peek stream with
       | None    -> mx
-      | Some(x) -> Stream.junk stream; search (Pervasives.max mx x)
+      | Some(x) ->
+        Stream.junk stream; search (Pervasives.max mx x)
     in
     search (Stream.next stream)
   ;;
@@ -165,6 +255,10 @@ module Stream = struct
     let list = ref [] in
     Stream.iter (fun v -> list := !list @ [v]) stream;
     !list
+  ;;
+
+  let to_array stream =
+    stream |> to_list |> Array.of_list
   ;;
 
   let skip n stream =
@@ -219,6 +313,16 @@ module List = struct
   let keep = List.filter
   ;;
 
+  let filteri p items =
+    let rec search i matching = function
+      | [] -> matching
+      | x :: items' ->
+        if p i x then search (i + 1) (x :: matching) items'
+        else search (i + 1) matching items'
+    in
+    search 0 [] items |> List.rev
+  ;;
+
   let min items =
     let rec search items =
       match items with
@@ -236,6 +340,17 @@ module List = struct
       | x :: tail -> Pervasives.max x (search tail)
     in
     search items
+  ;;
+
+  let minf f xs =
+    let minf a b = if f a < f b then a else b in
+    let rec search mx = function
+      | [] -> mx
+      | x :: xs -> search (minf mx x) xs
+    in
+    match xs with
+    | [] -> failwith "a non-empty list is required"
+    | x :: xs -> search x xs
   ;;
 
   let maxf f xs =
@@ -275,6 +390,17 @@ module List = struct
       if x = x' then xs'
       else x' :: (remove xs' x)
   ;;
+
+  let rol = function
+    | [] -> []
+    | x :: xs ->
+      let rec rol = function
+        | [] -> [x]
+        | hd :: tl -> hd :: rol tl
+      in
+      rol xs
+  ;;
+
 end
 
 let ( -- ) = List.remove;;
@@ -521,4 +647,3 @@ module Json = struct
   end
 
 end
-;;
