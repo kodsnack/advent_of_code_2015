@@ -44,6 +44,36 @@ let test1 () =
   assert ((List.length res2) = 7);
 ;;
 
+let reduce rules molecule =
+  let rules = rules |> List.map (fun (f,t) -> Str.regexp t, f) in
+  let shuffle _ _ = (Random.int 2) - 1 in
+  let rec reduce n rules = function
+    | "e" -> n
+    | molecule ->
+      let n', molecule' = rules |> List.fold_left (fun (n,m) (f,t) ->
+        let rec replace n m =
+          let m' = Str.replace_first f t m in
+          if m' = m then n,m
+          else replace (n + 1) m'
+        in replace n m
+      ) (n, molecule) in
+      if molecule' = molecule then reduce n (rules |> List.sort shuffle) molecule
+      else reduce n' rules molecule'
+  in reduce 0 rules molecule
+;;
+
+let test2 () =
+  let rules = [
+    ("e","H");
+    ("e","O");
+    ("H","HO");
+    ("H","OH");
+    ("O","HH");
+  ] in
+  reduce rules "HOHOHO"
+  |> Printf.printf "test2: target reached after %d reductions\n%!"
+;;
+
 let input_rules = [
   ("Al","ThF");
   ("Al","ThRnFAr");
@@ -98,5 +128,11 @@ let part1 () =
   |> Printf.printf "part1: %d distinct molecules possible\n%!"
 ;;
 
+let part2 () =
+  reduce input_rules input_initial
+  |> Printf.printf "part2: target reached after %d reductions\n%!"
+;;
+
 test1 ();;
 part1 ();;
+part2 ();;
