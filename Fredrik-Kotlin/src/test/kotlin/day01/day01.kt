@@ -1,4 +1,4 @@
-package test.day01
+package day01
 
 import org.junit.Test
 import test.util.loadInputAsLines

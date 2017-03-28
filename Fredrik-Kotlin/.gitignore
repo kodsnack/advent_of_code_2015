@@ -4,3 +4,4 @@ out
 day*.jar
 build/
 .gradle/
+local.properties
