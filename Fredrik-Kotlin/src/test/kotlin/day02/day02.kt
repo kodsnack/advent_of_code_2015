@@ -1,4 +1,4 @@
-package test.kotlin.day02
+package day02
 
 import org.junit.Test
 import test.util.loadInputAsLineList
