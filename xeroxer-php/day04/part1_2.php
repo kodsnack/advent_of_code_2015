@@ -8,11 +8,11 @@ while (true) {
     ++$answer;
     $md5 = md5("{$input}{$answer}");
     // Check if first five characters are all zeroes, set variable and continue
-    if (!$answerPart1 && substr($md5, 0, 5) === '00000') {
+    if (!$answerPart1 && strpos($md5, '00000') === 0) {
         $answerPart1 = $answer;
     }
     // Check if first six characters are all zeroes, then exit loop, we are done
-    if (substr($md5, 0, 6) === '000000') {
+    if (strpos($md5, '000000') === 0) {
         break;
     }
 }
