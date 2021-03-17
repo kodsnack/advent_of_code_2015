@@ -1,0 +1,3 @@
+[submodule "LinAGKar-rust"]
+	path = LinAGKar-rust
+	url = https://github.com/LinAGKar/advent-of-code-2015-rust.git
